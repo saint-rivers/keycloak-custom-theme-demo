@@ -1,0 +1,35 @@
+version: "3.8"
+
+volumes:
+  ou_keycloak_data:
+    driver: local
+
+services:
+  postgres:
+    image: postgres:9.6
+    container_name: ck-theme_postgres
+    environment:
+      POSTGRES_DB: keycloak
+      POSTGRES_USER: keycloak
+      POSTGRES_PASSWORD: password
+    volumes:
+      - ou_keycloak_data:/var/lib/postgresql/data
+
+  keycloak:
+    build: .
+    container_name: ck-theme_keycloak
+    volumes:
+      - ./themes/demo:/opt/jboss/keycloak/themes/demo
+    environment:
+      DB_VENDOR: POSTGRES
+      DB_ADDR: postgres
+      DB_DATABASE: keycloak
+      DB_USER: keycloak
+      DB_SCHEMA: public
+      DB_PASSWORD: password
+      KEYCLOAK_USER: admin
+      KEYCLOAK_PASSWORD: password
+    ports:
+      - 8800:8080
+    depends_on:
+      - postgres
